@@ -1,0 +1,2 @@
+# fintopio-airdrop-bot
+Yeah.
