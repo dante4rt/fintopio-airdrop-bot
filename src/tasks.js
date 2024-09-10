@@ -10,6 +10,7 @@ const {
 } = require('./api');
 const { displayHeader, displayOptions, createTable } = require('./display');
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const moment = require('moment');
 
 async function handleTasks(BEARERS) {
   displayHeader();
@@ -50,8 +51,9 @@ async function handleTasks(BEARERS) {
                 await delay(1000);
 
                 if (claimedTask) {
-                  console.log(`✔️ Task "${item.slug}" claimed!`.green);
-                  console.log(`🎉 Congrats!`.green);
+                  console.log(
+                    `✔️ Task "${item.slug}" claimed! Congrats! 🎉 `.green
+                  );
                 }
               }
             } else {
@@ -101,7 +103,9 @@ async function handleTasks(BEARERS) {
           }
         } catch (error) {
           console.log(
-            `❌ Error cracking diamond: ${error.response.data.message}`.red
+            `❌ Error cracking diamond: ${
+              error.response.data ? error.response.data.message : error
+            }`.red
           );
           console.log('');
         }
