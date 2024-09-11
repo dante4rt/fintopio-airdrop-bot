@@ -1,3 +1,4 @@
+const readlineSync = require('readline-sync');
 const { fetchReferralData } = require('./api');
 const {
   fetchTasks,
@@ -8,155 +9,204 @@ const {
   fetchDiamond,
   claimDiamond,
 } = require('./api');
-const { displayHeader, displayOptions, createTable } = require('./display');
+const { displayHeader, createTable } = require('./display');
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const moment = require('moment');
 
-async function handleTasks(BEARERS) {
-  displayHeader();
-  console.log(`🚀 Fetching data, please wait...\n`.yellow);
+async function automaticFlow(BEARERS) {
+  while (true) {
+    try {
+      console.log('📅 Auto daily check-in...'.yellow);
+      await handleDailyCheckin(BEARERS);
 
+      console.log('\n💎 Auto cracking diamond...'.yellow);
+      await handleDiamond(BEARERS);
+
+      console.log('\n🌱 Auto farming...'.yellow);
+      await handleFarming(BEARERS);
+    } catch (error) {
+      console.log(`❌ Error in automatic flow: ${error.message}`.red);
+    }
+
+    console.log('\n⏳ Waiting 30 minutes before the next run...'.yellow);
+    console.log(
+      "📢 While waiting, don't forget to subscribe to https://t.me/HappyCuanAirdrop for the latest and best airdrops and bots!\n"
+        .cyan
+    );
+    await delay(30 * 60 * 1000);
+  }
+}
+
+async function oneTimeFlow(BEARERS) {
   try {
-    const table = await createTable(BEARERS, fetchReferralData);
-    console.log(table);
+    const options = readlineSync.question(`
+Choose an option:
+1. 🚀 Auto complete all tasks
+2. 🪐 Auto click asteroid
+3. 📅 Auto daily check-in
+4. 🌱 Auto farming
+5. ❌ Exit
 
-    const options = displayOptions();
+Enter 1, 2, 3, 4, or 5: `);
 
-    if (options === '5' || !options) {
+    if (options === '5') {
       console.log('👋 Exiting the bot. See you next time!'.cyan);
       console.log('Subscribe: https://t.me/HappyCuanAirdrop.'.green);
       process.exit(0);
     }
 
     if (options === '1') {
-      for (const [index, BEARER] of BEARERS.entries()) {
-        const tasks = await fetchTasks(BEARER);
-
-        if (tasks) {
-          console.log(`#️⃣ ${index + 1} Account:`);
-
-          for (const item of tasks.tasks) {
-            if (item.status === 'available') {
-              console.log(`🚀 Starting '${item.slug}' task...`.yellow);
-
-              const startedTask = await startTask(BEARER, item.id);
-
-              if (startedTask.status === 'verifying') {
-                console.log(`✔️ Task "${item.slug}" started!`.green);
-
-                console.log(`🛠 Claiming ${item.slug} task...`.yellow);
-
-                const claimedTask = await claimTask(BEARER, item.id);
-
-                await delay(1000);
-
-                if (claimedTask) {
-                  console.log(
-                    `✔️ Task "${item.slug}" claimed! Congrats! 🎉 `.green
-                  );
-                }
-              }
-            } else {
-              console.log(`🛠 Claiming ${item.slug} task...`.yellow);
-
-              const claimedTask = await claimTask(BEARER, item.id);
-
-              await delay(1000);
-
-              if (claimedTask) {
-                console.log(
-                  `✔️ Task "${item.slug}" claimed! Congrats! 🎉 `.green
-                );
-              }
-            }
-          }
-
-          console.log(`All tasks has been cleared! ;)`.green);
-          console.log('');
-        }
-      }
+      await handleAllTasks(BEARERS);
     } else if (options === '2') {
-      for (const [index, BEARER] of BEARERS.entries()) {
-        console.log(`#️⃣ ${index + 1} Account:`);
-
-        try {
-          const getDiamondo = await fetchDiamond(BEARER);
-
-          if (getDiamondo.state === 'unavailable') {
-            console.log(
-              `❌ Your diamond is not available, please try again on ${moment(
-                getDiamondo.timings.nextAt
-              ).format('MMMM Do YYYY, h:mm:ss a')}`.red
-            );
-          } else {
-            console.log(`Please wait, we will crack the diamond...`.yellow);
-
-            await delay(1000);
-
-            await claimDiamond(BEARER, getDiamondo.diamondNumber);
-
-            console.log(
-              `Diamond has been cracked! You get ${getDiamondo.settings.totalReward} 💎`
-                .green
-            );
-            console.log('');
-          }
-        } catch (error) {
-          console.log(
-            `❌ Error cracking diamond: ${
-              error.response.data ? error.response.data.message : error
-            }`.red
-          );
-          console.log('');
-        }
-
-        await delay(500);
-      }
+      await handleDiamond(BEARERS);
     } else if (options === '3') {
-      for (const [index, BEARER] of BEARERS.entries()) {
-        console.log(`#️⃣ ${index + 1} Account:`);
-
-        const checkinData = await dailyCheckin(BEARER);
-
-        if (checkinData.claimed) {
-          console.log(`✔️ Daily check-in successful!`.green);
-        } else {
-          console.log(
-            `📅 You've already done the daily check-in. Try again tomorrow!`.red
-          );
-        }
-
-        console.log(`📅 Total daily check-ins: ${checkinData.totalDays}`.green);
-        console.log(`💰 Daily reward: ${checkinData.dailyReward}`.green);
-        console.log(`💵 Balance after check-in: ${checkinData.balance}`.green);
-        console.log('');
-      }
+      await handleDailyCheckin(BEARERS);
     } else if (options === '4') {
-      for (const [index, BEARER] of BEARERS.entries()) {
-        console.log(`#️⃣ ${index + 1} Account:`);
-
-        const farm = await startFarming(BEARER);
-
-        if (farm) {
-          console.log(`🌱 Farming started!`.green);
-          console.log(
-            `🌱 Start time: ${moment(farm.timings.start).format(
-              'MMMM Do YYYY, h:mm:ss a'
-            )}`.green
-          );
-          console.log(
-            `🌾 End time: ${moment(farm.timings.finish).format(
-              'MMMM Do YYYY, h:mm:ss a'
-            )}`.green
-          );
-          console.log('');
-        }
-      }
+      await handleFarming(BEARERS);
     } else {
       console.log('Invalid option!'.red);
     }
   } catch (error) {
-    console.log(`❌ Error: ${error}`.red);
+    console.log(`❌ Error: ${error.message}`.red);
+  }
+}
+
+async function handleAllTasks(BEARERS) {
+  for (const [index, BEARER] of BEARERS.entries()) {
+    const tasks = await fetchTasks(BEARER);
+
+    if (tasks) {
+      console.log(`#️⃣ ${index + 1} Account:`);
+
+      for (const item of tasks.tasks) {
+        if (item.status === 'available') {
+          console.log(`🚀 Starting '${item.slug}' task...`.yellow);
+
+          const startedTask = await startTask(BEARER, item.id);
+
+          if (startedTask.status === 'verifying') {
+            console.log(`✔️ Task "${item.slug}" started!`.green);
+
+            console.log(`🛠 Claiming ${item.slug} task...`.yellow);
+            const claimedTask = await claimTask(BEARER, item.id);
+
+            await delay(1000);
+
+            if (claimedTask) {
+              console.log(
+                `✔️ Task "${item.slug}" claimed! Congrats! 🎉 `.green
+              );
+            }
+          }
+        } else {
+          console.log(`🛠 Claiming ${item.slug} task...`.yellow);
+
+          const claimedTask = await claimTask(BEARER, item.id);
+          await delay(1000);
+
+          if (claimedTask) {
+            console.log(`✔️ Task "${item.slug}" claimed! Congrats! 🎉 `.green);
+          }
+        }
+      }
+    }
+  }
+}
+
+async function handleDiamond(BEARERS) {
+  for (const [index, BEARER] of BEARERS.entries()) {
+    console.log(`#️⃣ ${index + 1} Account:`);
+
+    try {
+      const getDiamondo = await fetchDiamond(BEARER);
+
+      if (getDiamondo.state === 'unavailable') {
+        console.log(
+          `❌ Your diamond is not available, please try again on ${moment(
+            getDiamondo.timings.nextAt
+          ).format('MMMM Do YYYY, h:mm:ss a')}`.red
+        );
+      } else {
+        console.log(`Please wait, we will crack the diamond...`.yellow);
+        await delay(1000);
+        await claimDiamond(BEARER, getDiamondo.diamondNumber);
+
+        console.log(
+          `Diamond has been cracked! You get ${getDiamondo.settings.totalReward} 💎`
+            .green
+        );
+      }
+    } catch (error) {
+      console.log(
+        `❌ Error cracking diamond: ${
+          error.response?.data ? error.response.data.message : error.message
+        }`.red
+      );
+    }
+    await delay(500);
+  }
+}
+
+async function handleDailyCheckin(BEARERS) {
+  for (const [index, BEARER] of BEARERS.entries()) {
+    console.log(`#️⃣ ${index + 1} Account:`);
+
+    const checkinData = await dailyCheckin(BEARER);
+
+    if (checkinData.claimed) {
+      console.log(`✔️ Daily check-in successful!`.green);
+    } else {
+      console.log(
+        `📅 You've already done the daily check-in. Try again tomorrow!`.red
+      );
+    }
+
+    console.log(`📅 Total daily check-ins: ${checkinData.totalDays}`.green);
+    console.log(`💰 Daily reward: ${checkinData.dailyReward}`.green);
+    console.log(`💵 Balance after check-in: ${checkinData.balance}`.green);
+  }
+}
+
+async function handleFarming(BEARERS) {
+  for (const [index, BEARER] of BEARERS.entries()) {
+    console.log(`#️⃣ ${index + 1} Account:`);
+
+    const farm = await startFarming(BEARER);
+
+    if (farm) {
+      console.log(`🌱 Farming started!`.green);
+      console.log(
+        `🌱 Start time: ${moment(farm.timings.start).format(
+          'MMMM Do YYYY, h:mm:ss a'
+        )}`.green
+      );
+      console.log(
+        `🌾 End time: ${moment(farm.timings.finish).format(
+          'MMMM Do YYYY, h:mm:ss a'
+        )}`.green
+      );
+    }
+  }
+}
+
+async function handleTasks(BEARERS) {
+  displayHeader();
+  console.log(`🚀 Fetching data, please wait...\n`.yellow);
+
+  const table = await createTable(BEARERS, fetchReferralData);
+  console.log(table);
+
+  const mode = readlineSync.question(
+    'Do you want to run the bot one-time (1) or continuously (2)?\n\nEnter 1 or 2: '
+  );
+
+  if (mode === '1') {
+    await oneTimeFlow(BEARERS);
+  } else if (mode === '2') {
+    console.log('Starting automatic flow...'.cyan);
+    await automaticFlow(BEARERS);
+  } else {
+    console.log('Invalid option!'.red);
   }
 }
 

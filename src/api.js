@@ -117,7 +117,7 @@ async function startFarming(token) {
     return data;
   } catch (error) {
     if (error.response.data.message.includes('already started')) {
-      console.log(`⚠️ Farming already started, try again later!\n`.red);
+      console.log(`⚠️ Farming already started, try again later!`.red);
     } else {
       console.log(`❌ Error starting farming: ${error}\n`);
     }
