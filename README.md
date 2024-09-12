@@ -1,5 +1,7 @@
 # 🚀 Fintopio Airdrop Bot
 
+Original repo: https://github.com/dante4rt/fintopio-airdrop-bot
+
 This is an automated bot to help you complete tasks, check in daily, and participate in farming on the Fintopio platform. The bot interacts with Fintopio's API to automate your tasks and save time!
 
 ## Features

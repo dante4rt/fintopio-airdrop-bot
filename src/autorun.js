@@ -55,9 +55,6 @@ async function handleAutomate(BEARERS) {
 
 async function runCheckinAndTask(BEARERS) {
   for (const [index, BEARER] of BEARERS.entries()) {
-    const tableDaily = await createTable(BEARERS, fetchReferralData);
-    console.log(tableDaily);
-
     console.log(`Account ${index + 1}:`);
 
     const checkinData = await dailyCheckin(BEARER);
@@ -115,14 +112,15 @@ async function runCheckinAndTask(BEARERS) {
         }
       }
     }
+    
+    const tableDaily = await createTable(BEARERS, fetchReferralData);
+    console.log(tableDaily);
+
   }
 }
 
 async function runFarm(BEARERS) {
   for (const [index, BEARER] of BEARERS.entries()) {
-    const tableFarm = await createTable(BEARERS, fetchReferralData);
-    console.log(tableFarm);
-
     console.log(`Account ${index + 1}:`);
     
     const claimResult = await claimFarming(BEARER);
@@ -150,14 +148,16 @@ async function runFarm(BEARERS) {
     }
     
     console.log('');
+
+    const tableFarm = await createTable(BEARERS, fetchReferralData);
+    console.log(tableFarm);
+
   }
 }
 
 
 async function runMine(BEARERS) {
   for (const [index, BEARER] of BEARERS.entries()) {
-    const tableMine = await createTable(BEARERS, fetchReferralData);
-    console.log(tableMine);
 
     console.log(`Account ${index + 1}:`);
 
@@ -193,6 +193,10 @@ async function runMine(BEARERS) {
     }
 
     await delay(500);
+
+    const tableMine = await createTable(BEARERS, fetchReferralData);
+    console.log(tableMine);
+
   } 
 }
 
