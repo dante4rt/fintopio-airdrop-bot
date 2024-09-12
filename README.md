@@ -62,7 +62,7 @@ After setting up the `bearers.json` file, you can run the bot with the following
 npm start
 ```
 
-Follow the instructions in the terminal to select your desired action. \
+Follow the instructions in the terminal to select your desired action. 
 
 > Use [GNU screen](https://www.gnu.org/software/screen/) for a better experience when using 🔄 Autorun features. 
 
