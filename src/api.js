@@ -13,7 +13,7 @@ async function fetchReferralData(token) {
     return data;
   } catch (error) {
     console.log(
-      `❌ Error fetching referral data: ${error.response.data.message}`.red
+      `Error fetching referral data: ${error.response.data.message}`.red
     );
   }
 }
@@ -30,7 +30,7 @@ async function fetchTasks(token) {
 
     return data;
   } catch (error) {
-    console.log(`❌ Error fetching tasks: ${error.response.data.message}`.red);
+    console.log(`Error fetching tasks: ${error.response.data.message}`.red);
   }
 }
 
@@ -52,10 +52,10 @@ async function startTask(token, id) {
       error.response.data.message.includes('not found')
     ) {
       console.log(
-        `⚠️ Task with ID "${id}" failed to start, please do it manually!`.red
+        `Task with ID "${id}" failed to start, please do it manually!`.red
       );
     } else {
-      console.log(`❌ Error starting task: ${error.response.data.message}`.red);
+      console.log(`Error starting task: ${error.response.data.message}`.red);
     }
   }
 }
@@ -78,10 +78,10 @@ async function claimTask(token, id) {
       error.response.data.message.includes('not found')
     ) {
       console.log(
-        `⚠️ Task with ID "${id}" failed to claim, please do it manually!`.red
+        `Task with ID "${id}" failed to claim, please do it manually!`.red
       );
     } else {
-      console.log(`❌ Error claiming task: ${error.response.data.message}`.red);
+      console.log(`Error claiming task: ${error.response.data.message}`.red);
     }
   }
 }
@@ -99,7 +99,28 @@ async function dailyCheckin(token) {
 
     return data;
   } catch (error) {
-    console.log(`❌ Error during daily check-in: ${error}`);
+    console.log(`Error during daily check-in: ${error}`);
+  }
+}
+
+async function claimFarming(token) {
+  try {
+    const { data } = await axios({
+      url: 'https://fintopio-tg.fintopio.com/api/farming/claim',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {},
+    });
+
+    return data;
+  } catch (error) {
+    if (error.response.data.message.includes('already claimed')) {
+      console.log(`Farming already claimed, try again later!\n`.red);
+    } else {
+    console.log(`Error claiming farming: ${error}\n`);
+    }
   }
 }
 
@@ -117,9 +138,9 @@ async function startFarming(token) {
     return data;
   } catch (error) {
     if (error.response.data.message.includes('already started')) {
-      console.log(`⚠️ Farming already started, try again later!`.red);
+      console.log(`Farming already started, try again later!\n`.red);
     } else {
-      console.log(`❌ Error starting farming: ${error}\n`);
+      console.log(`Error starting farming: ${error}\n`);
     }
   }
 }
@@ -137,7 +158,7 @@ async function fetchDiamond(token) {
     return data;
   } catch (error) {
     console.log(
-      `❌ Error fetching diamond: ${error.response.data.message}`.red
+      `Error fetching diamond: ${error.response.data.message}`.red
     );
   }
 }
@@ -167,6 +188,7 @@ module.exports = {
   startTask,
   claimTask,
   dailyCheckin,
+  claimFarming,
   startFarming,
   fetchDiamond,
   claimDiamond,

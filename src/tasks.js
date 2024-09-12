@@ -6,6 +6,7 @@ const {
   claimTask,
   dailyCheckin,
   startFarming,
+  claimFarming,
   fetchDiamond,
   claimDiamond,
 } = require('./api');
@@ -170,6 +171,14 @@ async function handleDailyCheckin(BEARERS) {
 async function handleFarming(BEARERS) {
   for (const [index, BEARER] of BEARERS.entries()) {
     console.log(`#️⃣ ${index + 1} Account:`);
+
+    const claimResult = await claimFarming(BEARER);
+    
+    if (claimResult) {
+      console.log(`🎉 Farming rewards claimed successfully!`.green);
+    } else {
+      console.log(`No farming rewards to claim or claiming failed.`.red);
+    }
 
     const farm = await startFarming(BEARER);
 

@@ -7,15 +7,16 @@ This is an automated bot to help you complete tasks, check in daily, and partici
 - ✅ Auto complete all tasks
 - 💎 Auto click asteroid (diamond)
 - 📅 Auto daily check-in
-- 🌱 Auto farming
+- 🌱 Auto farming (claim and start)
+- 🔄 Autorun
 
 ## Installation
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/dante4rt/fintopio-airdrop-bot.git
-   cd fintopio-airdrop-bot
+   git clone https://github.com/eljaladz/fintopio-bot.git
+   cd fintopio-bot
    ```
 
 2. Install dependencies:
@@ -40,7 +41,7 @@ The `bearers.json` file should be an array of strings, each string being a beare
 
 ### How to get your Bearer Token
 
-1. Open the Fintopio Telegram Bot: [JOIN HERE](https://fintop.io/2uM1qMLs5F)
+1. Open the Fintopio Telegram Bot: [JOIN HERE](https://fintop.io/UzXNTxGw)
 2. Right-click anywhere in the bot and select **Inspect** to open the browser's developer tools.
 3. Navigate to the **Console** tab.
 4. Paste the following code in the console:
@@ -61,6 +62,8 @@ npm start
 
 Follow the instructions in the terminal to select your desired action.
 
+Use [GNU screen](https://www.gnu.org/software/screen/) for a better experience when using 🔄 Autorun features. 
+
 ## Contributing
 
 Feel free to submit issues or create pull requests to improve the bot.
@@ -72,6 +75,10 @@ If you would like to support the development of this project, you can make a don
 - **Solana**: `GLQMG8j23ookY8Af1uLUg4CQzuQYhXcx56rkpZkyiJvP`
 - **EVM**: `0x960EDa0D16f4D70df60629117ad6e5F1E13B8F44`
 - **BTC**: `bc1p9za9ctgwwvc7amdng8gvrjpwhnhnwaxzj3nfv07szqwrsrudfh6qvvxrj8`
+
+- **EVM**: `0xfD1847bFAA92fb8c0d100b207d377490C5acd34c`
+- **SOL**: `BBZjp11sJNvekXZEBhhYDro9gsyyhEKXXcfEEub5ubje`
+- **TON**: `UQDoLQNF-nt9CFOHBs9mQqxH9YJKrZ6mFPbAeHH8Jo9xIGCb`
 
 ## License
 
