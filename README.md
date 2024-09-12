@@ -60,9 +60,13 @@ After setting up the `bearers.json` file, you can run the bot with the following
 npm start
 ```
 
-Follow the instructions in the terminal to select your desired action.
+Follow the instructions in the terminal to select your desired action. \
 
-Use [GNU screen](https://www.gnu.org/software/screen/) for a better experience when using 🔄 Autorun features. 
+> Use [GNU screen](https://www.gnu.org/software/screen/) for a better experience when using 🔄 Autorun features. 
+
+## Disclaimer
+
+This project is for educational purposes only. Use at your own risk. The authors are not responsible for any consequences resulting from the use of this software.
 
 ## Contributing
 
@@ -74,11 +78,11 @@ If you would like to support the development of this project, you can make a don
 
 - **Solana**: `GLQMG8j23ookY8Af1uLUg4CQzuQYhXcx56rkpZkyiJvP`
 - **EVM**: `0x960EDa0D16f4D70df60629117ad6e5F1E13B8F44`
-- **BTC**: `bc1p9za9ctgwwvc7amdng8gvrjpwhnhnwaxzj3nfv07szqwrsrudfh6qvvxrj8`
+- **BTC**: `bc1p9za9ctgwwvc7amdng8gvrjpwhnhnwaxzj3nfv07szqwrsrudfh6qvvxrj8` \
 
+- **TON**: `UQDoLQNF-nt9CFOHBs9mQqxH9YJKrZ6mFPbAeHH8Jo9xIGCb`
 - **EVM**: `0xfD1847bFAA92fb8c0d100b207d377490C5acd34c`
 - **SOL**: `BBZjp11sJNvekXZEBhhYDro9gsyyhEKXXcfEEub5ubje`
-- **TON**: `UQDoLQNF-nt9CFOHBs9mQqxH9YJKrZ6mFPbAeHH8Jo9xIGCb`
 
 ## License
 
