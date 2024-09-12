@@ -9,7 +9,7 @@ function displayHeader() {
   console.log('=    https://t.me/HappyCuanAirdrop     ='.cyan);
   console.log('========================================'.cyan);
   console.log('       ☂  Modified by NoDrops ☂       '.yellow);
-  console.log('      🌐 https://t.me/NoDrops 🌐       '.yellow);
+  console.log('         https://t.me/NoDrops          '.yellow);
   console.log();
 }
 
