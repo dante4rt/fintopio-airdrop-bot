@@ -15,36 +15,37 @@ const moment = require('moment');
 const { createTable } = require('./display');
 
 async function handleAutomate(BEARERS) {
+  console.log('')
   console.log(`Fetching data, please wait...\n`.yellow);
+
+  const currentTime = new Date();
+  console.log(`Current time: ${currentTime.toLocaleTimeString('en-GB')}`);
 
   const table = await createTable(BEARERS, fetchReferralData);
   console.log(table);
 
-  cron.schedule('1 7,19 * * *', () => {
-    console.log('Running Checkin and Task'.cyan);
-    runCheckinAndTask(BEARERS);
+  cron.schedule('0 7-23,0 * * *', () => {
+    const currentTime = new Date();
+    console.log(`Fetching data, please wait...`.yellow);
+    console.log('')
+    console.log(`Current time: ${currentTime.toLocaleTimeString('en-GB')}`);
+    createTable(BEARERS, fetchReferralData);
+    console.log('')
   });
 
-  let farmCount = 0;
-  cron.schedule('2 7,15,23 * * *', () => {
-    if (farmCount < 3) {
-      console.log(`Running Farm (${farmCount + 1}/3)`.cyan);
+  cron.schedule('1 7 * * *', () => {
+      console.log('Running Checkin and Task'.cyan);
+      runCheckinAndTask(BEARERS);
+  });
+
+  cron.schedule('3 7,15,23 * * *', () => {
+      console.log(`Running Farm`.cyan);
       runFarm(BEARERS);
-      farmCount++;
-    } else {
-      farmCount = 0; 
-    }
   });
 
-  let mineCount = 0;
-  cron.schedule('3 8-23,0-7 * * *', () => {
-    if (mineCount < 24) {
-      console.log(`Running Mine (${mineCount + 1}/24)`.cyan);
+  cron.schedule('5 8-23,0-7 * * *', () => {
+      console.log(`Running Mine`.cyan);
       runMine(BEARERS);
-      mineCount++;
-    } else {
-      mineCount = 0;
-    }
   });
   
   console.log('');
