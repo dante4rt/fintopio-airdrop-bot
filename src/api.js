@@ -1,9 +1,10 @@
 const axios = require('axios');
+const BASE_URL = 'https://fintopio-tg.fintopio.com/api/';
 
 async function fetchReferralData(token) {
   try {
     const { data } = await axios({
-      url: 'https://fintopio-tg.fintopio.com/api/referrals/data',
+      url: BASE_URL + 'referrals/data',
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -21,7 +22,7 @@ async function fetchReferralData(token) {
 async function fetchTasks(token) {
   try {
     const { data } = await axios({
-      url: 'https://fintopio-tg.fintopio.com/api/hold/tasks',
+      url: BASE_URL + 'hold/tasks',
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -37,7 +38,7 @@ async function fetchTasks(token) {
 async function startTask(token, id) {
   try {
     const { data } = await axios({
-      url: `https://fintopio-tg.fintopio.com/api/hold/tasks/${id}/start`,
+      url: BASE_URL + `hold/tasks/${id}/start`,
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -63,7 +64,7 @@ async function startTask(token, id) {
 async function claimTask(token, id) {
   try {
     const { data } = await axios({
-      url: `https://fintopio-tg.fintopio.com/api/hold/tasks/${id}/claim`,
+      url: BASE_URL + `hold/tasks/${id}/claim`,
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -89,7 +90,7 @@ async function claimTask(token, id) {
 async function dailyCheckin(token) {
   try {
     const { data } = await axios({
-      url: 'https://fintopio-tg.fintopio.com/api/daily-checkins',
+      url: BASE_URL + 'daily-checkins',
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -106,7 +107,7 @@ async function dailyCheckin(token) {
 async function startFarming(token) {
   try {
     const { data } = await axios({
-      url: 'https://fintopio-tg.fintopio.com/api/farming/farm',
+      url: BASE_URL + 'farming/farm',
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -119,15 +120,36 @@ async function startFarming(token) {
     if (error.response.data.message.includes('already started')) {
       console.log(`⚠️ Farming already started, try again later!`.red);
     } else {
-      console.log(`❌ Error starting farming: ${error}\n`);
+      console.log(`❌ Error starting farming: ${error}`);
     }
+  }
+}
+
+async function claimFarming(token) {
+  try {
+    const { data } = await axios({
+      url: BASE_URL + 'farming/claim',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {},
+    });
+
+    return data;
+  } catch (error) {
+    console.log(
+      `❌ Error claiming farming: ${
+        error.response.data ? error.response.data.message : error
+      }`
+    );
   }
 }
 
 async function fetchDiamond(token) {
   try {
     const { data } = await axios({
-      url: 'https://fintopio-tg.fintopio.com/api/clicker/diamond/state',
+      url: BASE_URL + 'clicker/diamond/state',
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -145,7 +167,7 @@ async function fetchDiamond(token) {
 async function claimDiamond(token, id) {
   try {
     const { data } = await axios({
-      url: 'https://fintopio-tg.fintopio.com/api/clicker/diamond/complete',
+      url: BASE_URL + 'clicker/diamond/complete',
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -168,6 +190,7 @@ module.exports = {
   claimTask,
   dailyCheckin,
   startFarming,
+  claimFarming,
   fetchDiamond,
   claimDiamond,
 };

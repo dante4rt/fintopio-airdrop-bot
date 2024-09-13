@@ -1,11 +1,10 @@
 const readlineSync = require('readline-sync');
-const { fetchReferralData } = require('./api');
+const { fetchReferralData, claimFarming } = require('./api');
 const {
   fetchTasks,
   startTask,
   claimTask,
   dailyCheckin,
-  startFarming,
   fetchDiamond,
   claimDiamond,
 } = require('./api');
@@ -171,7 +170,7 @@ async function handleFarming(BEARERS) {
   for (const [index, BEARER] of BEARERS.entries()) {
     console.log(`#️⃣ ${index + 1} Account:`);
 
-    const farm = await startFarming(BEARER);
+    const farm = await claimFarming(BEARER);
 
     if (farm) {
       console.log(`🌱 Farming started!`.green);
