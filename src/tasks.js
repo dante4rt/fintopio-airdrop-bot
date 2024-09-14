@@ -1,6 +1,8 @@
 const readlineSync = require('readline-sync');
-const { fetchReferralData, claimFarming } = require('./api');
 const {
+  fetchReferralData,
+  claimFarming,
+  startFarming,
   fetchTasks,
   startTask,
   claimTask,
@@ -170,20 +172,51 @@ async function handleFarming(BEARERS) {
   for (const [index, BEARER] of BEARERS.entries()) {
     console.log(`#️⃣ ${index + 1} Account:`);
 
-    const farm = await claimFarming(BEARER);
+    try {
+      const farm = await claimFarming(BEARER);
 
-    if (farm) {
-      console.log(`🌱 Farming started!`.green);
-      console.log(
-        `🌱 Start time: ${moment(farm.timings.start).format(
-          'MMMM Do YYYY, h:mm:ss a'
-        )}`.green
-      );
-      console.log(
-        `🌾 End time: ${moment(farm.timings.finish).format(
-          'MMMM Do YYYY, h:mm:ss a'
-        )}`.green
-      );
+      if (farm) {
+        console.log(`🌱 Farming started!`.green);
+        console.log(
+          `🌱 Start time: ${moment(farm.timings.start).format(
+            'MMMM Do YYYY, h:mm:ss a'
+          )}`.green
+        );
+        console.log(
+          `🌾 End time: ${moment(farm.timings.finish).format(
+            'MMMM Do YYYY, h:mm:ss a'
+          )}`.green
+        );
+      }
+    } catch (error) {
+      if (error.response?.data?.message.includes('not finished yet')) {
+        console.log(
+          `⚠️ Farming not finished yet, attempting to start new farming...`
+            .yellow
+        );
+
+        const reFarm = await startFarming(BEARER);
+
+        if (reFarm) {
+          console.log(`🌱 Re-farming started!`.green);
+          console.log(
+            `🌱 Start time: ${moment(reFarm.timings.start).format(
+              'MMMM Do YYYY, h:mm:ss a'
+            )}`.green
+          );
+          console.log(
+            `🌾 End time: ${moment(reFarm.timings.finish).format(
+              'MMMM Do YYYY, h:mm:ss a'
+            )}`.green
+          );
+        }
+      } else {
+        console.log(
+          `❌ Error handling farming: ${
+            error.response?.data?.message || error.message
+          }`.red
+        );
+      }
     }
   }
 }

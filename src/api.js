@@ -126,24 +126,16 @@ async function startFarming(token) {
 }
 
 async function claimFarming(token) {
-  try {
-    const { data } = await axios({
-      url: BASE_URL + 'farming/claim',
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      data: {},
-    });
+  const { data } = await axios({
+    url: BASE_URL + 'farming/claim',
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: {},
+  });
 
-    return data;
-  } catch (error) {
-    console.log(
-      `❌ Error claiming farming: ${
-        error.response.data ? error.response.data.message : error
-      }`
-    );
-  }
+  return data;
 }
 
 async function fetchDiamond(token) {
