@@ -228,8 +228,8 @@ async function handleTasks(BEARERS) {
   const table = await createTable(BEARERS, fetchReferralData);
   console.log(table);
 
-  const mode = readlineSync.question(
-    'Do you want to run the bot one-time (1) or continuously (2)?\n\nEnter 1 or 2: '
+  const mode = process.argv[2] || readlineSync.question(
+  'Do you want to run the bot one-time (1) or continuously (2)?\n\nEnter 1 or 2: '
   );
 
   if (mode === '1') {
