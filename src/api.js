@@ -1,6 +1,189 @@
-const cron = require('node-cron');
-const { fetchReferralData } = require('./api');
-const {
+const axios = require('axios');
+
+async function fetchReferralData(token) {
+  try {
+    const { data } = await axios({
+      url: 'https://fintopio-tg.fintopio.com/api/referrals/data',
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return data;
+  } catch (error) {
+    console.log(
+      `✗ Error fetching referral data: ${error.response.data.message}`.red
+    );
+  }
+}
+
+async function fetchTasks(token) {
+  try {
+    const { data } = await axios({
+      url: 'https://fintopio-tg.fintopio.com/api/hold/tasks',
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return data;
+  } catch (error) {
+    console.log(`✗ Error fetching tasks: ${error.response.data.message}`.red);
+  }
+}
+
+async function startTask(token, id) {
+  try {
+    const { data } = await axios({
+      url: `https://fintopio-tg.fintopio.com/api/hold/tasks/${id}/start`,
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {},
+    });
+
+    return data;
+  } catch (error) {
+    if (
+      error.response.data.message.includes('update task') ||
+      error.response.data.message.includes('not found')
+    ) {
+      console.log(
+        `✗ Task with ID "${id}" failed to start, please do it manually!`.red
+      );
+    } else {
+      console.log(`✗ Error starting task: ${error.response.data.message}`.red);
+    }
+  }
+}
+
+async function claimTask(token, id) {
+  try {
+    const { data } = await axios({
+      url: `https://fintopio-tg.fintopio.com/api/hold/tasks/${id}/claim`,
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {},
+    });
+
+    return data;
+  } catch (error) {
+    if (
+      error.response.data.message.includes('update task') ||
+      error.response.data.message.includes('not found')
+    ) {
+      console.log(
+        `✗ Task with ID "${id}" failed to claim, please do it manually!`.red
+      );
+    } else {
+      console.log(`✗ Error claiming task: ${error.response.data.message}`.red);
+    }
+  }
+}
+
+async function dailyCheckin(token) {
+  try {
+    const { data } = await axios({
+      url: 'https://fintopio-tg.fintopio.com/api/daily-checkins',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {},
+    });
+
+    return data;
+  } catch (error) {
+    console.log(`✗ Error during daily check-in: ${error}`);
+  }
+}
+
+async function claimFarming(token) {
+  try {
+    const { data } = await axios({
+      url: 'https://fintopio-tg.fintopio.com/api/farming/claim',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {},
+    });
+
+    return data;
+  } catch (error) {
+    if (error.response.data.message.includes('already claimed')) {
+      console.log(`Farming already claimed, try again later!\n`.red);
+    } else {
+    console.log(`✗ Error claiming farming: ${error}`.yellow);
+    }
+  }
+}
+
+async function startFarming(token) {
+  try {
+    const { data } = await axios({
+      url: 'https://fintopio-tg.fintopio.com/api/farming/farm',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {},
+    });
+
+    return data;
+  } catch (error) {
+    if (error.response.data.message.includes('already started')) {
+      console.log(`Farming already started, try again later!\n`.red);
+    } else {
+      console.log(`✗ Error starting farming: ${error}\n`);
+    }
+  }
+}
+
+async function fetchDiamond(token) {
+  try {
+    const { data } = await axios({
+      url: 'https://fintopio-tg.fintopio.com/api/clicker/diamond/state',
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return data;
+  } catch (error) {
+    console.log(
+      `✗ Error fetching diamond: ${error.response.data.message}`.red
+    );
+  }
+}
+
+async function claimDiamond(token, id) {
+  try {
+    const { data } = await axios({
+      url: 'https://fintopio-tg.fintopio.com/api/clicker/diamond/complete',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {
+        diamondNumber: id,
+      },
+    });
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+module.exports = {
+  fetchReferralData,
   fetchTasks,
   startTask,
   claimTask,
@@ -9,201 +192,4 @@ const {
   startFarming,
   fetchDiamond,
   claimDiamond,
-} = require('./api');
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const moment = require('moment');
-const { createTable } = require('./display');
-
-async function handleAutomate(BEARERS) {
-  console.log('');
-  console.log(`Fetching data, please wait...\n`.yellow);
-
-  const currentTime = new Date();
-  console.log(`Current time: ${currentTime.toLocaleTimeString('en-GB')}`);
-
-  const table = await createTable(BEARERS, fetchReferralData);
-  console.log(table);
-  console.log('');
-
-  console.log('Running bot for the first time...\n'.cyan);
-  await runCheckin(BEARERS);
-  await runFarm(BEARERS);
-  await runMine(BEARERS);
-  await runTasks(BEARERS);
-  console.log('Completed ✓\n'.green);
-
-  cron.schedule('0 0-23 * * *', () => {
-    const currentTime = new Date();
-    console.log(`Fetching data, please wait...`.yellow);
-    console.log('')
-    console.log(`Current time: ${currentTime.toLocaleTimeString('en-GB')}`);
-    createTable(BEARERS, fetchReferralData);
-    console.log('')
-  });
-
-  cron.schedule('1 7 * * *', () => {
-      console.log('Running Checkin and Task'.cyan);
-      runCheckin(BEARERS);
-  });
-
-  cron.schedule('3 7,15,23 * * *', () => {
-      console.log(`Running Farm`.cyan);
-      runFarm(BEARERS);
-  });
-
-  cron.schedule('5 0-23 * * *', () => {
-      console.log(`Running Mine`.cyan);
-      runMine(BEARERS);
-  });
-
-  cron.schedule('10 7 * * 1,3,5', () => {
-      console.log(`Running Mine`.cyan);
-      runTasks(BEARERS);
-  });
-  
-  console.log('Tasks scheduled. The bot will run automatically.'.green);
-  console.log('Subscribe: https://t.me/NoDrops ☂\n'.green);
-}
-
-async function runCheckin(BEARERS) {
-  for (const [index, BEARER] of BEARERS.entries()) {
-    console.log(`Account ${index + 1}:`);
-
-    const checkinData = await dailyCheckin(BEARER);
-
-    if (checkinData.claimed) {
-      console.log(`Daily check-in successful!`.green);
-    } else {
-      console.log(
-        `✗ You've already done the daily check-in. Try again tomorrow!`.red
-      );
-    }
-
-    console.log(`Total daily check-ins: ${checkinData.totalDays}`.green);
-    console.log(`Daily reward: ${checkinData.dailyReward}`.green);
-    console.log(`Balance after check-in: ${checkinData.balance}`.green);
-    console.log('');
-  }
-}
-
-async function runFarm(BEARERS) {
-  for (const [index, BEARER] of BEARERS.entries()) {
-    console.log(`Account ${index + 1}:`);
-    
-    const claimResult = await claimFarming(BEARER);
-    if (claimResult) {
-      console.log(`Farming rewards claimed successfully!`.green);
-    } else {
-      console.log(`✗ No farming rewards to claim.`.yellow);
-    }
-
-    const farm = await startFarming(BEARER);
-    if (farm) {
-      console.log(`New farming session started!`.green);
-      console.log(
-        `Start time: ${moment(farm.timings.start).format(
-          'MMMM Do YYYY, h:mm:ss a'
-        )}`.green
-      );
-      console.log(
-        `End time: ${moment(farm.timings.finish).format(
-          'MMMM Do YYYY, h:mm:ss a'
-        )}`.green
-      );
-    } else {
-      console.log(`✗ Failed to start new farming session.`.red);
-      console.log('');
-    }
-  }
-}
-
-
-async function runMine(BEARERS) {
-  for (const [index, BEARER] of BEARERS.entries()) {
-
-    console.log(`Account ${index + 1}:`);
-
-    try {
-      const getDiamondo = await fetchDiamond(BEARER);
-
-      if (getDiamondo.state === 'unavailable') {
-        console.log(
-          `✗ Your diamond is not available, please try again on ${moment(
-            getDiamondo.timings.nextAt
-          ).format('MMMM Do YYYY, h:mm:ss a')}`.red
-        );
-        console.log('');
-      } else {
-        console.log(`Please wait, we will crack the diamond...`.yellow);
-
-        await delay(2500);
-
-        await claimDiamond(BEARER, getDiamondo.diamondNumber);
-
-        console.log(
-          `Diamond has been cracked! You get ${getDiamondo.settings.totalReward} ◈!`
-            .green
-        );
-        console.log('');
-      }
-    } catch (error) {
-      console.log(
-        `✗ Error cracking diamond: ${
-          error.response.data ? error.response.data.message : error
-        }`.red
-      );
-      console.log('');
-    }
-    await delay(500);
-  } 
-}
-
-async function runTasks(BEARERS) {
-  for (const [index, BEARER] of BEARERS.entries()) {
-    console.log(`Account ${index + 1}:`);
-    const tasks = await fetchTasks(BEARER);
-
-    for (const item of tasks.tasks) {
-      if (item.status === 'available') {
-        console.log(`Starting '${item.slug}' task...`.yellow);
-
-        const startedTask = await startTask(BEARER, item.id);
-
-        if (startedTask.status === 'verifying') {
-            console.log(`Task "${item.slug}" started!`.green);
-
-            console.log(`Claiming ${item.slug} task...`.yellow);
-
-            const claimedTask = await claimTask(BEARER, item.id);
-
-            await delay(1000);
-
-            if (claimedTask) {
-              console.log(
-              `Task "${item.slug}" claimed! Congrats!`.green
-              );
-            }
-        }
-      } else {
-        console.log(`Claiming ${item.slug} task...`.yellow);
-
-        const claimedTask = await claimTask(BEARER, item.id);
-
-        await delay(1000);
-
-        console.log('');
-
-        if (claimedTask) {
-          console.log(
-            `Task "${item.slug}" claimed! Congrats!`.green
-          );
-          console.log('');
-        }
-      }
-    }
-  }
-}
-
-module.exports = {
-  handleAutomate,
 };
