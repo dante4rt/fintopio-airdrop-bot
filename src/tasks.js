@@ -211,11 +211,39 @@ async function handleFarming(BEARERS) {
           );
         }
       } else {
-        console.log(
-          `❌ Error handling farming: ${
-            error.response?.data?.message || error.message
-          }`.red
-        );
+        if (
+          error.response?.data?.message.includes('has not been started yet')
+        ) {
+          // fresh created account(new fintopio user) cant automatically start new farming,
+          // so we gonna start it again from this error msg
+
+          console.log(
+            `⚠️ Farming has not been started yet, attempting to start new farming...`
+              .yellow
+          );
+
+          const farm = await startFarming(BEARER);
+
+          if (farm) {
+            console.log(`🌱 Farm started!`.green);
+            console.log(
+              `🌱 Start time: ${moment(farm.timings.start).format(
+                'MMMM Do YYYY, h:mm:ss a'
+              )}`.green
+            );
+            console.log(
+              `🌾 End time: ${moment(farm.timings.finish).format(
+                'MMMM Do YYYY, h:mm:ss a'
+              )}`.green
+            );
+          }
+        } else {
+          console.log(
+            `❌ Error handling farming: ${
+              error.response?.data?.message || error.message
+            }`.red
+          );
+        }
       }
     }
   }
@@ -228,9 +256,11 @@ async function handleTasks(BEARERS) {
   const table = await createTable(BEARERS, fetchReferralData);
   console.log(table);
 
-  const mode = process.argv[2] || readlineSync.question(
-  'Do you want to run the bot one-time (1) or continuously (2)?\n\nEnter 1 or 2: '
-  );
+  const mode =
+    process.argv[2] ||
+    readlineSync.question(
+      'Do you want to run the bot one-time (1) or continuously (2)?\n\nEnter 1 or 2: '
+    );
 
   if (mode === '1') {
     await oneTimeFlow(BEARERS);
