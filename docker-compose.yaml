@@ -1,0 +1,21 @@
+# Deprecated since new version of Docker-compose
+# version: '3'
+
+services:
+  app:
+    build: .
+    container_name: Fintopio-bot
+    volumes:
+      - .:/usr/src/app
+    
+    command: ["npm", "start", "--", "2"]
+
+    # Resource constraints
+    deploy:
+      resources:
+        limits:
+          # Limit CPU usage to a maximum of 0.25 cores (25% of a CPU core).
+          cpus: '0.25'  
+          
+          # Limit memory usage to a maximum of 100MB.
+          memory: 100M
