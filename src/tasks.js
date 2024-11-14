@@ -154,7 +154,7 @@ async function handleDailyCheckin(BEARERS) {
 
     const checkinData = await dailyCheckin(BEARER);
 
-    if (checkinData.claimed) {
+    if (checkinData.dailyReward) {
       console.log(`✔️ Daily check-in successful!`.green);
     } else {
       console.log(
